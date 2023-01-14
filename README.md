@@ -1,7 +1,7 @@
 # myDiabby
 OpenSource tools to try help with Diabete
 
-## Insulin Basal Counselor
+## OpenSource Insulin Basal Counselor
 
 ### description
 The OpenSource Insulin Counseler takes patient meals time as entry data table and then it looks for the daily time ranges where the glucose
