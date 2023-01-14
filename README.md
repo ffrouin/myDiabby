@@ -9,4 +9,4 @@ helps to evaluate how to modify the patient basal scheme. In this example, meals
 and the patient digestion of his meal (ie. glucose assimilation process and rates).
 
 ## exemple
-![OpenSource Insulin Counselor](20230113_OpenSourceInsulinBasalCounselor.png)
+![OpenSource Insulin Counselor](20230114_OpenSourceInsulinBasalCounselor.png)
