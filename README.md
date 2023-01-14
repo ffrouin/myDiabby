@@ -18,15 +18,15 @@ and the patient digestion of his meal (ie. glucose assimilation process and rate
 
 [numpy](https://numpy.org/) : scientific computing engine
 
-You also need be able to export a fresh csv from the [myDiabby](https://app.mydiabby.com/dt/#/login) platform of patient.
+### data requirements
+
+[myDiabby](https://app.mydiabby.com/dt/#/login) to extract health data of patient as a csv file
 
 ### usage
 
 ```
-usage: Glycemia Basal Counselor [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -w WEIGHT -ip
-                                INSULINPUMP -is INSULINSENSITIVITY -gs GLUCOSESENSOR
-                                [-df DATEFORWARD] [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
-                                [-cmd CORRECTMEDIANDEVIATION]
+usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE [-m MEALS] [-ip INSULINPUMP] [-is INSULINSENSITIVITY] [-ir INSULINREFERENCE] [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
+                                   [-ecmd ENABLEMEDIANDEVIATIONCORRECTION] [-cmd CORRECTMEDIANDEVIATION]
 
 OpenSource tools that tries help with diabetes
 
@@ -38,17 +38,20 @@ options:
   -ln LASTNAME, --lastname LASTNAME
                         paient lastname
   -a AGE, --age AGE     patient age
-  -w WEIGHT, --weight WEIGHT
-                        patient weight (Kg)
+  -m MEALS, --meals MEALS
+                        time list of patient meals. Default list is "07:00,12:00,16:00,19:00"
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
                         patient insulin sensitivity
+  -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
+                        patient insulin reference
+  -il INSULINACTIVELENGTH, --insulinactivelength INSULINACTIVELENGTH
+                        patient insulin active length in seconds. Default is 2h (7200)
   -gs GLUCOSESENSOR, --glucosesensor GLUCOSESENSOR
                         patient glucose sensor reference
   -df DATEFORWARD, --dateforward DATEFORWARD
-                        number of days to look forward from now to proceed to glycemic profile
-                        analysis
+                        number of days to look forward from now to proceed to glycemic profile analysis
   -ecmd ENABLEMEDIANDEVIATIONCORRECTION, --enablemediandeviationcorrection ENABLEMEDIANDEVIATIONCORRECTION
                         experimental - process to correct deviation of data series
   -cmd CORRECTMEDIANDEVIATION, --correctmediandeviation CORRECTMEDIANDEVIATION
