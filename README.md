@@ -8,5 +8,48 @@ helps to evaluate how to modify the patient basal scheme. In this example, meals
 2h after meals of processing as this are the areas where glucose concentration may not be stable due to the difference between insulin action
 and the patient digestion of his meal (ie. glucose assimilation process and rates).
 
+## libraries requirements
+
+python
+matplotlib
+numpy
+
+## usage
+
+```
+usage: Glycemia Basal Counselor [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -w WEIGHT -ip
+                                INSULINPUMP -is INSULINSENSITIVITY -gs GLUCOSESENSOR
+                                [-df DATEFORWARD] [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
+                                [-cmd CORRECTMEDIANDEVIATION]
+
+OpenSource tools that tries help with diabetes
+
+options:
+  -h, --help            show this help message and exit
+  -f MYDIABBYCSVFILE, --mydiabbycsvfile MYDIABBYCSVFILE
+                        path to access myDiabby csv export file
+  -n NAME, --name NAME  patient name
+  -ln LASTNAME, --lastname LASTNAME
+                        paient lastname
+  -a AGE, --age AGE     patient age
+  -w WEIGHT, --weight WEIGHT
+                        patient weight (Kg)
+  -ip INSULINPUMP, --insulinpump INSULINPUMP
+                        patient insulin pump reference
+  -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
+                        patient insulin sensitivity
+  -gs GLUCOSESENSOR, --glucosesensor GLUCOSESENSOR
+                        patient glucose sensor reference
+  -df DATEFORWARD, --dateforward DATEFORWARD
+                        number of days to look forward from now to proceed to glycemic profile
+                        analysis
+  -ecmd ENABLEMEDIANDEVIATIONCORRECTION, --enablemediandeviationcorrection ENABLEMEDIANDEVIATIONCORRECTION
+                        experimental - process to correct deviation of data series
+  -cmd CORRECTMEDIANDEVIATION, --correctmediandeviation CORRECTMEDIANDEVIATION
+                        experimental - max deviation target to reach until to stop data correction
+
+Additionnal details available on https://github.com/ffrouin/myDiabby
+```
+
 ## exemple
 ![OpenSource Insulin Counselor](20230114_OpenSourceInsulinBasalCounselor.png)
