@@ -13,10 +13,12 @@ and the patient digestion of his meal (ie. glucose assimilation process and rate
 ### libraries requirements
 
 [python](https://www.python.org/)
+
 [matplotlib](https://matplotlib.org/)
+
 [numpy](https://numpy.org/)
 
-You also need be able to export a fresh csv from the (myDiabby)[https://app.mydiabby.com/dt/#/login] platform of patient.
+You also need be able to export a fresh csv from the [myDiabby](https://app.mydiabby.com/dt/#/login) platform of patient.
 
 ### usage
 
