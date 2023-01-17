@@ -70,6 +70,10 @@ Additionnal details available on https://github.com/ffrouin/myDiabby
 ![OpenSource Insulin Counselor](20230114_OpenSourceInsulinBasalCounselor.png)
 
 ## OpenSource Insulin Bolus Counselor
+The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.
+It then select all bolus data series that did start close to the glycemia target (+/- 10% of patient insulin sensitivity) to make sure to analize
+the quantity of insulin supplied to the patient against his meal carbone count. The bolus data series starting outside the target range could then
+be analized to evaluate patient insulin sensitivity (not yet included in report).
 
 ### usage
 ```
