@@ -20,12 +20,13 @@ parser = argparse.ArgumentParser(
 				description = 'OpenSource tools that tries help with diabetes',
 				epilog = 'Additionnal details available on https://github.com/ffrouin/myDiabby')
 
-parser.add_argument("-f", "--mydiabbycsvfile", required=False, help='path to access myDiabby csv export file',default='myDiabby_data_20230116_leon_frouin_tripoteau.csv')
-parser.add_argument("-n", "--name", type=str, required=False, help='patient name',default='name')
-parser.add_argument("-ln", "--lastname", type=str, required=False, help='paient lastname',default='lastname')
-parser.add_argument("-a", "--age", type=str, required=False, help='patient age',default='2.5')
-parser.add_argument("-m", "--meals", type=str, required=False, help='time list of patient meals. Default list is "07:00,12:00,16:00,19:00"',default='07:00,12:00,16:00,19:00')
+parser.add_argument("-f", "--mydiabbycsvfile", required=True, help='path to access myDiabby csv export file')
+parser.add_argument("-n", "--name", type=str, required=True, help='patient name')
+parser.add_argument("-ln", "--lastname", type=str, required=True, help='paient lastname')
+parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
+parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
+parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, mmol/L')
 parser.add_argument("-is", "--insulinsensitivity", type=int, required=False, help='patient insulin sensitivity', default=160)
 parser.add_argument("-gt", "--glycemiatarget", type=int, required=False, help='patient glycemia target', default=120)
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
@@ -122,7 +123,7 @@ def select_data(t_start, t_end, data):
 
 meals = args.meals.split(',')
 insulin_active_length = args.insulinactivelength # secs
-insulin_sensitivity = args.insulinsensitivity # mg/dl
+insulin_sensitivity = args.insulinsensitivity # 
 
 glycemia_stats = {}
 glycemia_x = []
@@ -188,6 +189,15 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 #		if args.date not in mydiabby_line[0]: # filtering mode
 #			continue
 
+		if str(start_date).split(" ")[0] == mydiabby_line[0]:
+			capture = True
+			
+		if str(end_date).split(" ")[0] == mydiabby_line[0]:
+			capture = False
+
+		if not capture:
+			continue
+		
 		# collect last known weight to report
 		if mydiabby_line[13] != '':
 			last_known_weight = mydiabby_line[13]
@@ -197,15 +207,6 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if mydiabby_line[14] != '':
 			last_known_hba1c = mydiabby_line[14]
 			last_known_hba1c_date = mydiabby_line[0]	
-
-		if str(start_date).split(" ")[0] == mydiabby_line[0]:
-			capture = True
-			
-		if str(end_date).split(" ")[0] == mydiabby_line[0]:
-			capture = False
-
-		if not capture:
-			continue
 		
 		# collect max ketones seen in the capture period to report
 		if mydiabby_line[15] != '':
@@ -224,7 +225,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 			meal_index += 1
 			
 		if mydiabby_line[18] != '':
-			bolus_carb = int(mydiabby_line[18])
+			bolus_carb = float(mydiabby_line[18])
 			
 		# check if a bolus is done
 		if mydiabby_line[6] != '':
@@ -235,7 +236,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		glycemia = mydiabby_line[2]
 		if glycemia == '':
 			continue
-		glycemia = int(glycemia)
+		glycemia = float(glycemia)
 		
 		if t not in glycemia_stats.keys():
 			glycemia_stats[t] = []
@@ -293,7 +294,7 @@ if args.enablemediandeviationcorrection:
 
 fig, ax = plt.subplots()
 median_patch = mpatches.Patch(color='indigo', label='median', alpha=0.75)
-median_sync_bolus_patch = mpatches.Patch(color='red', label='median of time sync bolus starting at '+str(args.glycemiatarget)+'mg/dl +/-'+f'{insulin_sensitivity/10:0.2f}'+"mg/dl", alpha=0.75)
+median_sync_bolus_patch = mpatches.Patch(color='red', label='median of time sync bolus starting at '+str(args.glycemiatarget)+args.unit+' +/-'+f'{insulin_sensitivity/10:0.2f}'+args.unit, alpha=0.75)
 ax.legend(handles=[median_patch,median_sync_bolus_patch])
   
 # main document warnings and report tables
@@ -318,7 +319,7 @@ plt.text(9*3600,360,s="weight : "+str(last_known_weight)+"Kg ["+last_known_weigh
 plt.text(12*3600,372,s="insulin pump : "+args.insulinpump,fontsize=7)
 plt.text(12*3600,366,s="glucose sensor : "+args.glucosesensor,fontsize=7)
 
-plt.text(15*3600,372,s="insulin sensitivity : "+str(args.insulinsensitivity)+" mg/dl for 1U",fontsize=7)
+plt.text(15*3600,372,s="insulin sensitivity : "+str(args.insulinsensitivity)+" "+args.unit+" for 1U",fontsize=7)
 plt.text(15*3600,366,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
 plt.text(15*3600,360,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
 if last_max_ketones > 0:
@@ -327,7 +328,7 @@ else:
 	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386,s="revision : v0.2 build 20230117_01",fontsize=7)
+plt.text(22*3600,386,s="revision : v0.3 build 20230126_01",fontsize=7)
 plt.text(22*3600,380,s="created on 20230116",fontsize=7)
 plt.text(22*3600,374,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
@@ -337,7 +338,7 @@ plt.text(-11000,-32,s="the quantity of insulin supplied to the patient against h
 plt.text(-11000,-38,s="be analized to evaluate patient insulin sensitivity (not yet included in report). In this report, meals are planned at "+args.meals,fontsize=7)
 #plt.text(-11000,-44,s="",fontsize=7)
 		 
-plt.ylabel('glucose mg/dl')
+plt.ylabel('glucose '+args.unit)
 plt.ylim(0,350)
 plt.yticks([0,50,70,100,150,180,200,250,300,350])
 
@@ -369,9 +370,9 @@ plt.grid(color='lightblue',alpha=0.25,axis='y')
 	   
 s=12
 
-#plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_max, sigma=s), gaussian_filter1d(glycemia_min, sigma=s), interpolate=True, color='mediumpurple', alpha=0.25)
-#plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_mg_p10, sigma=s), gaussian_filter1d(glycemia_mg_p90, sigma=s), interpolate=True, color='violet', alpha=0.25)
-#plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_mg_p25,sigma=s), gaussian_filter1d(glycemia_mg_p75, sigma=s), interpolate=True, color='blueviolet', alpha=0.25)
+plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_max, sigma=s), gaussian_filter1d(glycemia_min, sigma=s), interpolate=True, color='mediumpurple', alpha=0.25)
+plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_mg_p10, sigma=s), gaussian_filter1d(glycemia_mg_p90, sigma=s), interpolate=True, color='violet', alpha=0.25)
+plt.fill_between(glycemia_x, gaussian_filter1d(glycemia_mg_p25,sigma=s), gaussian_filter1d(glycemia_mg_p75, sigma=s), interpolate=True, color='blueviolet', alpha=0.25)
 
 plt.scatter(glycemia_x, glycemia_median, 0.1, color='indigo', alpha=0.8)
 plt.scatter(glycemia_bolus_x, glycemia_bolus_median, 0.1, color='red', alpha=1.0)
@@ -389,9 +390,9 @@ for r in meals:
 	label = r+"-"+int2hm(hm2int(r)+insulin_active_length)
 	label2 = ''
 	if gdelta > 0:
-		label2 = '+'+f'{gdelta:.3f}'+" mg/dl"
+		label2 = '+'+f'{gdelta:.3f}'+" "+args.unit
 	else:
-		label2 = f'{gdelta:.3f}' +" mg/dl"
+		label2 = f'{gdelta:.3f}' +" "+args.unit
 	if iq > 0:
 		label2 += ' +'+f'{iq:.3f}'+"U"
 	else:

@@ -20,17 +20,19 @@ parser = argparse.ArgumentParser(
 				description = 'OpenSource tools that tries help with diabetes',
 				epilog = 'Additionnal details available on https://github.com/ffrouin/myDiabby')
 
-parser.add_argument("-f", "--mydiabbycsvfile", required=True, help='path to access myDiabby csv export file',)
+parser.add_argument("-f", "--mydiabbycsvfile", required=True, help='path to access myDiabby csv export file')
 parser.add_argument("-n", "--name", type=str, required=True, help='patient name')
 parser.add_argument("-ln", "--lastname", type=str, required=True, help='paient lastname')
 parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
-parser.add_argument("-m", "--meals", type=str, required=False, help='time list of patient meals. Default list is "07:00,12:00,16:00,19:00"',default='07:00,12:00,16:00,19:00')
+parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
+parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, mmol/L')
 parser.add_argument("-is", "--insulinsensitivity", type=int, required=False, help='patient insulin sensitivity', default=160)
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
-parser.add_argument("-il", "--insulinactivelength", type=int, required=False, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
+parser.add_argument("-il", "--insulinactivelength", type=int, required=True, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
 parser.add_argument("-gs", "--glucosesensor", type=str, required=False, help='patient glucose sensor reference', default='na')
 parser.add_argument("-df", "--dateforward", type=int, default=15, help='number of days to look forward from now to proceed to glycemic profile analysis')
+parser.add_argument("-sd", "--startdate", type=str, default='now', help='date to start analyze with, now() by default or YYYY/MM/DD')
 parser.add_argument("-ecmd", "--enablemediandeviationcorrection", type=bool, default=False, help='experimental - process to correct deviation of data series')
 parser.add_argument("-cmd", "--correctmediandeviation", type=int, default=30, help='experimental - max deviation target to reach until to stop data correction')
 
@@ -136,7 +138,7 @@ def basalEfficientSubRanges(ranges, r_step=300, r_scan_length=5400, r_min=900):
 
 meals = args.meals.split(',')
 insulin_active_length = args.insulinactivelength # secs
-insulin_sensitivity = args.insulinsensitivity # mg/dl
+insulin_sensitivity = args.insulinsensitivity
 
 glycemia_stats = {}
 glycemia_x = []
@@ -161,7 +163,10 @@ advices_irate = []
 
 capture = False;
 start_date = datetime.datetime.today() - datetime.timedelta(days=args.dateforward)
-end_date = datetime.datetime.now()
+end_date = datetime.datetime.today()
+if 'now' not in args.startdate:
+	end_date = datetime.datetime.strptime(args.startdate, '%Y/%m/%d')
+	start_date = datetime.datetime.strptime(args.startdate, '%Y/%m/%d') - datetime.timedelta(days=args.dateforward)
 
 last_known_weight = 0
 last_known_weight_date = ''
@@ -182,6 +187,12 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 
 		if str(start_date).split(" ")[0] in mydiabby_line[0]:
 			capture = True
+			
+		if str(end_date).split(" ")[0] == mydiabby_line[0]:
+			capture = False
+		
+		if not capture:
+			continue
 		
 		# collect last known weight to report
 		if mydiabby_line[13] != '':
@@ -192,9 +203,6 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if mydiabby_line[14] != '':
 			last_known_hba1c = mydiabby_line[14]
 			last_known_hba1c_date = mydiabby_line[0]	
-		
-		if not capture:
-			continue
 		
 		# collect max ketones seen in the capture period to report
 		if mydiabby_line[15] != '':
@@ -208,7 +216,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if glycemia == '':
 			continue
 	
-		glycemia = int(mydiabby_line[2])
+		glycemia = float(mydiabby_line[2])
 		if t not in glycemia_stats.keys():
 			glycemia_stats[t] = []
 		glycemia_stats[t].append(glycemia)
@@ -247,6 +255,7 @@ ax.legend(handles=[median_patch,mg_p25_75_patch,mg_p10_90_patch,minmax_patch])
   
 # main document warnings and report tables
 
+plt.get_current_fig_manager().set_window_title('OpenSource Insulin Basal Counselor')
 plt.suptitle("OpenSource Insulin Basal Counselor",fontsize=20)
 
 plt.text(-11000,392,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALTH DATA OLDER THAN 15 DAYS",color='red',fontsize=8)
@@ -254,7 +263,7 @@ plt.text(-11000,386,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME
 plt.text(-11000,380,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
 plt.text(4.5*3600,372,s="data start :          "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366,s="data length :       "+str(args.dateforward)+" days",fontsize=7)
+plt.text(4.5*3600,366,s="data end :           "+str(end_date),fontsize=7)
 plt.text(4.5*3600,360,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
 plt.text(4.5*3600,354,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
 
@@ -275,7 +284,7 @@ else:
 	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386,s="revision : v0.7 build 20230114_02",fontsize=7)
+plt.text(22*3600,386,s="revision : v0.8 build 20230126_01",fontsize=7)
 plt.text(22*3600,380,s="created on 20230111",fontsize=7)
 plt.text(22*3600,374,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
@@ -285,7 +294,7 @@ plt.text(-11000,-32,s="helps to evaluate how to modify the patient basal scheme.
 plt.text(-11000,-38,s="2h after meals of processing as these are the areas where glucose concentration may not be stable due to the difference between insulin action",fontsize=7)
 plt.text(-11000,-44,s="and the patient digestion of his meal (ie. glucose assimilation process and rates).",fontsize=7)
 		 
-plt.ylabel('glucose mg/dl')
+plt.ylabel('glucose '+args.unit)
 plt.ylim(0,350)
 plt.yticks([0,50,70,100,150,180,200,250,300,350])
 
@@ -364,7 +373,7 @@ for r in x:
 	label = ''
 	if (advices_gdelta[i] >0):
 		label = '[+'
-	label += f'{advices_gdelta[i]:.2f}' + 'mg/dl ' + f'{advices_iquantity[i]:.3f}' + 'U]'
+	label += f'{advices_gdelta[i]:.2f}' + args.unit + ' ' + f'{advices_iquantity[i]:.3f}' + 'U]'
 	plt.text((r[0]+r[1])/2,y[i][-1]+43,s=label,fontsize=7, c=scale_lightness(color, 0.75))
 	i+=1
 

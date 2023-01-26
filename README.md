@@ -31,8 +31,12 @@ and the patient digestion of his meal (ie. glucose assimilation process and rate
 ### usage
 
 ```
-usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE [-m MEALS] [-ip INSULINPUMP] [-is INSULINSENSITIVITY] [-ir INSULINREFERENCE] [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
-                                   [-ecmd ENABLEMEDIANDEVIATIONCORRECTION] [-cmd CORRECTMEDIANDEVIATION]
+usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
+                                   [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
+                                   [-ir INSULINREFERENCE] -il INSULINACTIVELENGTH
+                                   [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
+                                   [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
+                                   [-cmd CORRECTMEDIANDEVIATION]
 
 OpenSource tools that tries help with diabetes
 
@@ -45,9 +49,10 @@ options:
                         paient lastname
   -a AGE, --age AGE     patient age
   -m MEALS, --meals MEALS
-                        time list of patient meals. Default list is "07:00,12:00,16:00,19:00"
+                        time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
+  -u UNIT, --unit UNIT  mg/dl, mmol/L
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
                         patient insulin sensitivity
   -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
@@ -57,17 +62,16 @@ options:
   -gs GLUCOSESENSOR, --glucosesensor GLUCOSESENSOR
                         patient glucose sensor reference
   -df DATEFORWARD, --dateforward DATEFORWARD
-                        number of days to look forward from now to proceed to glycemic profile analysis
-  -ecmd ENABLEMEDIANDEVIATIONCORRECTION, --enablemediandeviationcorrection ENABLEMEDIANDEVIATIONCORRECTION
-                        experimental - process to correct deviation of data series
-  -cmd CORRECTMEDIANDEVIATION, --correctmediandeviation CORRECTMEDIANDEVIATION
-                        experimental - max deviation target to reach until to stop data correction
+                        number of days to look forward from now to proceed to glycemic profile
+                        analysis
+  -sd STARTDATE, --startdate STARTDATE
+                        date to start analyze with, now() by default or YYYY/MM/DD
 
 Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
 
 ### exemple
-![OpenSource Insulin Counselor](20230114_OpenSourceInsulinBasalCounselor.png)
+![OpenSource Insulin Counselor](20230126_OpenSourceInsulinBasalCounselor.png)
 
 ## OpenSource Insulin Bolus Counselor
 The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.
@@ -77,8 +81,8 @@ be analized to evaluate patient insulin sensitivity (not yet included in report)
 
 ### usage
 ```
-usage: glycemia_bolus_counselor.py [-h] [-f MYDIABBYCSVFILE] [-n NAME] [-ln LASTNAME] [-a AGE]
-                                   [-m MEALS] [-ip INSULINPUMP] [-is INSULINSENSITIVITY]
+usage: glycemia_bolus_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
+                                   [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
                                    [-gt GLYCEMIATARGET] [-ir INSULINREFERENCE]
                                    [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
                                    [-sd STARTDATE] [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
@@ -95,9 +99,10 @@ options:
                         paient lastname
   -a AGE, --age AGE     patient age
   -m MEALS, --meals MEALS
-                        time list of patient meals. Default list is "07:00,12:00,16:00,19:00"
+                        time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
+  -u UNIT, --unit UNIT  mg/dl, mmol/L
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
                         patient insulin sensitivity
   -gt GLYCEMIATARGET, --glycemiatarget GLYCEMIATARGET
@@ -121,7 +126,6 @@ options:
 Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
 
-
 ### exemple
-![OpenSource Insulin Counselor](20230117_OpenSourceInsulinBolusCounselor.png)
+![OpenSource Insulin Counselor](20230126_OpenSourceInsulinBolusCounselor.png)
 
