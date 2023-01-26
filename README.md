@@ -15,11 +15,13 @@ All information, thought, and code described here is intended for informational 
 
 ### libraries
 
-[python](https://www.python.org/) : main dev language
+[python](https://www.python.org/) : Main programming language
 
-[matplotlib](https://matplotlib.org/) : mathematic rendering engine
+[matplotlib](https://matplotlib.org/) : Comprehensive library for creating static, animated, and interactive visualizations
 
-[numpy](https://numpy.org/) : scientific computing engine
+[numpy](https://numpy.org/) : The fundamental package for scientific computing
+
+[scipy](https://scipy.org/) : Fundamental algorithms for scientific computing
 
 ### data
 
