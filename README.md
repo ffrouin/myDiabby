@@ -35,8 +35,6 @@ usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME 
                                    [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
                                    [-ir INSULINREFERENCE] -il INSULINACTIVELENGTH
                                    [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
-                                   [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
-                                   [-cmd CORRECTMEDIANDEVIATION]
 
 OpenSource tools that tries help with diabetes
 
@@ -85,8 +83,7 @@ usage: glycemia_bolus_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME 
                                    [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
                                    [-gt GLYCEMIATARGET] [-ir INSULINREFERENCE]
                                    [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
-                                   [-sd STARTDATE] [-ecmd ENABLEMEDIANDEVIATIONCORRECTION]
-                                   [-cmd CORRECTMEDIANDEVIATION]
+                                   [-sd STARTDATE]
 
 OpenSource tools that tries help with diabetes
 
@@ -118,10 +115,6 @@ options:
                         analysis
   -sd STARTDATE, --startdate STARTDATE
                         date to start analyze with, now() by default
-  -ecmd ENABLEMEDIANDEVIATIONCORRECTION, --enablemediandeviationcorrection ENABLEMEDIANDEVIATIONCORRECTION
-                        experimental - process to correct deviation of data series
-  -cmd CORRECTMEDIANDEVIATION, --correctmediandeviation CORRECTMEDIANDEVIATION
-                        experimental - max deviation target to reach until to stop data correction
 
 Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
