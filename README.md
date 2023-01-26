@@ -5,6 +5,12 @@ The toolkit actually is based on two tools :
   - the basal counselor : for basal scheme changes
   - the bolus counselor : to adjust basal and/or bolus ratio of meals
 
+## DISCLAIMER AND WARNINGS
+
+This tool has been developped by parents of a Diabete Type 1 child in order to have a better understanding of the insulin treatment changes driven by his diabetic pediatrician.
+
+All information, thought, and code described here is intended for informational and educational purposes only. Do not use the information or code to make medical decisions. Share the information with your doctor if you think there is interresting data here to try take advantage of.
+
 ## Requirements
 
 ### libraries
