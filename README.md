@@ -71,7 +71,7 @@ Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
 
 ### exemple
-![OpenSource Insulin Counselor](20230126_OpenSourceInsulinBasalCounselor.png)
+![OpenSource Insulin Counselor](20230126_OpenSource_Insulin_Basal_Counselor.png)
 
 ## OpenSource Insulin Bolus Counselor
 The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.
@@ -127,5 +127,5 @@ Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
 
 ### exemple
-![OpenSource Insulin Counselor](20230126_OpenSourceInsulinBolusCounselor.png)
+![OpenSource Insulin Counselor](20230126_OpenSource_Insulin_Bolus_Counselor.png)
 
