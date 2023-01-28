@@ -14,6 +14,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter1d
 import colorsys
 import datetime
+import sys
 
 parser = argparse.ArgumentParser(
 				prog = 'glycemia_basal_counselor.py',
@@ -27,7 +28,7 @@ parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
 parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
 parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, mmol/L')
-parser.add_argument("-is", "--insulinsensitivity", type=int, required=False, help='patient insulin sensitivity', default=160)
+parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit)')
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
 parser.add_argument("-il", "--insulinactivelength", type=int, required=True, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
 parser.add_argument("-gs", "--glucosesensor", type=str, required=False, help='patient glucose sensor reference', default='na')
@@ -176,7 +177,7 @@ last_max_ketones = 0
 last_max_ketones_date = ''
 
 # proceed to myDiabby import
-
+captureFlag = False
 with open(args.mydiabbycsvfile, newline='') as mydiabby:
 	mydiabby_export = csv.reader(mydiabby,delimiter=',')
 	for mydiabby_line in mydiabby_export:
@@ -187,6 +188,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 
 		if str(start_date).split(" ")[0] in mydiabby_line[0]:
 			capture = True
+			captureFlag = True
 			
 		if str(end_date).split(" ")[0] == mydiabby_line[0]:
 			capture = False
@@ -220,6 +222,11 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if t not in glycemia_stats.keys():
 			glycemia_stats[t] = []
 		glycemia_stats[t].append(glycemia)
+
+
+if not captureFlag:
+	print("data loading issue : ",str(start_date).split(' ')[0], "not found in", args.mydiabbycsvfile)
+	sys.exit(0)
 
 # proceed to median analysis against captured data
 
@@ -284,7 +291,7 @@ else:
 	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386,s="revision : v0.8 build 20230126_01",fontsize=7)
+plt.text(22*3600,386,s="revision : v0.9 build 20230128_01",fontsize=7)
 plt.text(22*3600,380,s="created on 20230111",fontsize=7)
 plt.text(22*3600,374,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
