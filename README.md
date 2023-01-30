@@ -40,7 +40,7 @@ and the patient digestion of his meal (ie. glucose assimilation process and rate
 
 ```
 usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
-                                   [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
+                                   [-ip INSULINPUMP] -u UNIT -is INSULINSENSITIVITY
                                    [-ir INSULINREFERENCE] -il INSULINACTIVELENGTH
                                    [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
 
@@ -60,7 +60,7 @@ options:
                         patient insulin pump reference
   -u UNIT, --unit UNIT  mg/dl, mmol/L
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
-                        patient insulin sensitivity
+                        patient insulin sensitivity (same unit as --unit)
   -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
                         patient insulin reference
   -il INSULINACTIVELENGTH, --insulinactivelength INSULINACTIVELENGTH
@@ -88,10 +88,9 @@ be analized to evaluate patient insulin sensitivity (not yet included in report)
 ### usage
 ```
 usage: glycemia_bolus_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
-                                   [-ip INSULINPUMP] -u UNIT [-is INSULINSENSITIVITY]
-                                   [-gt GLYCEMIATARGET] [-ir INSULINREFERENCE]
-                                   [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
-                                   [-sd STARTDATE]
+                                   [-ip INSULINPUMP] -u UNIT -is INSULINSENSITIVITY -gt
+                                   GLYCEMIATARGET [-ir INSULINREFERENCE] [-il INSULINACTIVELENGTH]
+                                   [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
 
 OpenSource tools that tries help with diabetes
 
@@ -107,11 +106,11 @@ options:
                         time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
-  -u UNIT, --unit UNIT  mg/dl, mmol/L
+  -u UNIT, --unit UNIT  mg/dl, g/l, mmol/l
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
-                        patient insulin sensitivity
+                        patient insulin sensitivity (same unit as --unit)
   -gt GLYCEMIATARGET, --glycemiatarget GLYCEMIATARGET
-                        patient glycemia target
+                        patient glycemia target (same unit as --unit)
   -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
                         patient insulin reference
   -il INSULINACTIVELENGTH, --insulinactivelength INSULINACTIVELENGTH
@@ -125,6 +124,7 @@ options:
                         date to start analyze with, now() by default
 
 Additionnal details available on https://github.com/ffrouin/myDiabby
+
 ```
 
 ### exemple
