@@ -39,6 +39,14 @@ parser.add_argument("-cmd", "--correctmediandeviation", type=int, default=30, he
 
 args = parser.parse_args()
 
+unit_divider = 1
+if 'mg/' in args.unit:
+	unit_divider = 1
+elif 'g/' in args.unit:
+	unit_divider = 100
+elif 'mmol/' in args.unit:
+	unit_divider = 18
+
 def scale_lightness(rgb, scale_l):
     # convert rgb to hls
     h, l, s = colorsys.rgb_to_hls(*rgb)
@@ -259,51 +267,52 @@ mg_p25_75_patch = mpatches.Patch(color='blueviolet', label='25-75%', alpha=0.75)
 mg_p10_90_patch = mpatches.Patch(color='violet', label='10-90%', alpha=0.75)
 minmax_patch =  mpatches.Patch(color='mediumpurple', label='min-max', alpha=0.75)
 ax.legend(handles=[median_patch,mg_p25_75_patch,mg_p10_90_patch,minmax_patch])
-  
+ 
 # main document warnings and report tables
 
 plt.get_current_fig_manager().set_window_title('OpenSource Insulin Basal Counselor')
 plt.suptitle("OpenSource Insulin Basal Counselor",fontsize=20)
 
-plt.text(-11000,392,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALTH DATA OLDER THAN 15 DAYS",color='red',fontsize=8)
-plt.text(-11000,386,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
-plt.text(-11000,380,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
+plt.text(-11000,392/unit_divider,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALTH DATA OLDER THAN 15 DAYS",color='red',fontsize=8)
+plt.text(-11000,386/unit_divider,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
+plt.text(-11000,380/unit_divider,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
-plt.text(4.5*3600,372,s="data start :          "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366,s="data end :           "+str(end_date),fontsize=7)
-plt.text(4.5*3600,360,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
-plt.text(4.5*3600,354,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
+plt.text(4.5*3600,372/unit_divider,s="data start :         "+str(start_date),fontsize=7)
+plt.text(4.5*3600,366/unit_divider,s="data end :           "+str(end_date),fontsize=7)
+plt.text(4.5*3600,360/unit_divider,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
+plt.text(4.5*3600,354/unit_divider,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
 
-plt.text(9*3600,372,s="patient : "+args.name+" "+args.lastname,fontsize=7)
-plt.text(9*3600,366,s="age : "+str(args.age)+ " years old",fontsize=7)
-plt.text(9*3600,360,s="weight : "+str(last_known_weight)+"Kg ["+last_known_weight_date+"]",fontsize=7)
+plt.text(9*3600,372/unit_divider,s="patient : "+args.name+" "+args.lastname,fontsize=7)
+plt.text(9*3600,366/unit_divider,s="age : "+str(args.age)+ " years old",fontsize=7)
+plt.text(9*3600,360/unit_divider,s="weight : "+str(last_known_weight)+"Kg ["+last_known_weight_date+"]",fontsize=7)
 
 
-plt.text(12*3600,372,s="insulin pump : "+args.insulinpump,fontsize=7)
-plt.text(12*3600,366,s="glucose sensor : "+args.glucosesensor,fontsize=7)
+plt.text(12*3600,372/unit_divider,s="insulin pump : "+args.insulinpump,fontsize=7)
+plt.text(12*3600,366/unit_divider,s="glucose sensor : "+args.glucosesensor,fontsize=7)
 
-plt.text(15*3600,372,s="insulin sensitivity : "+str(args.insulinsensitivity)+" mg/dl for 1U",fontsize=7)
-plt.text(15*3600,366,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
-plt.text(15*3600,360,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
+plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+str(args.insulinsensitivity)+args.unit+" for 1U",fontsize=7)
+plt.text(15*3600,366/unit_divider,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
+plt.text(15*3600,360/unit_divider,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
 if last_max_ketones > 0:
-	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l ["+last_max_ketones_date+"]",fontsize=7)
+	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l ["+last_max_ketones_date+"]",fontsize=7)
 else:
-	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
+	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
-plt.text(22*3600,392,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386,s="revision : v0.9 build 20230128_01",fontsize=7)
-plt.text(22*3600,380,s="created on 20230111",fontsize=7)
-plt.text(22*3600,374,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
+plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.10 build 20230130_01",fontsize=7)
+plt.text(22*3600,380/unit_divider,s="created on 20230111",fontsize=7)
+plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
-plt.text(-11000,-20,s="The OpenSource Insulin Counseler takes patient meals time as entry data table and then it looks for the daily time ranges where the glucose",fontsize=7)
-plt.text(-11000,-26,s="concentration in blood should be stable. In these areas, using a linear regressive process against the median values of glucose concentration",fontsize=7)
-plt.text(-11000,-32,s="helps to evaluate how to modify the patient basal scheme. In this report, meals are planned at "+args.meals+" and we do exclude",fontsize=7)
-plt.text(-11000,-38,s="2h after meals of processing as these are the areas where glucose concentration may not be stable due to the difference between insulin action",fontsize=7)
-plt.text(-11000,-44,s="and the patient digestion of his meal (ie. glucose assimilation process and rates).",fontsize=7)
+plt.text(-11000,-20/unit_divider,s="The OpenSource Insulin Counseler takes patient meals time as entry data table and then it looks for the daily time ranges where the glucose",fontsize=7)
+plt.text(-11000,-26/unit_divider,s="concentration in blood should be stable. In these areas, using a linear regressive process against the median values of glucose concentration",fontsize=7)
+plt.text(-11000,-32/unit_divider,s="helps to evaluate how to modify the patient basal scheme. In this report, meals are planned at "+args.meals+" and we do exclude",fontsize=7)
+plt.text(-11000,-38/unit_divider,s="2h after meals of processing as these are the areas where glucose concentration may not be stable due to the difference between insulin action",fontsize=7)
+plt.text(-11000,-44/unit_divider,s="and the patient digestion of his meal (ie. glucose assimilation process and rates).",fontsize=7)
 		 
 plt.ylabel('glucose '+args.unit)
-plt.ylim(0,350)
-plt.yticks([0,50,70,100,150,180,200,250,300,350])
+	
+plt.ylim(0,350/unit_divider)
+plt.yticks([0,50/unit_divider,70/unit_divider,100/unit_divider,150/unit_divider,180/unit_divider,200/unit_divider,250/unit_divider,300/unit_divider,350/unit_divider])
 
 plt.xlabel('time')
 plt.xticks(ticks=[0,3600,7200,10800,14400,18000,21600,25200,28800,32400,36000,\
@@ -311,23 +320,23 @@ plt.xticks(ticks=[0,3600,7200,10800,14400,18000,21600,25200,28800,32400,36000,\
 				 75600,79200,82800,86400], labels=['0h00','1h00','2h00','3h00','4h00',
 				 '5h00','6h00','7h00','8h00','9h00','10h00','11h00','12h00',\
 				 '13h00','14h00','15h00','16h00','17h00','18h00','19h00',\
-				 '20h00','21h00','22h00','23h00','24h00'])
+				 '20h00','21h00','22h00','23h00','24h00'])									              	
+	
+plt.bar(-301,350/unit_divider,600,color='red',alpha=0.75)
+plt.bar(-301,250/unit_divider,600,color='orange',alpha=0.75)
+plt.bar(-301,179/unit_divider,600,color='lightgreen',alpha=0.75)
+plt.bar(-301,70/unit_divider,600,color='lightblue',alpha=0.75)
+plt.bar(-301,50/unit_divider,600,color='darkblue',alpha=0.75)
 
-plt.bar(-301,350,600,color='red',alpha=0.75)
-plt.bar(-301,250,600,color='orange',alpha=0.75)
-plt.bar(-301,179,600,color='lightgreen',alpha=0.75)
-plt.bar(-301,70,600,color='lightblue',alpha=0.75)
-plt.bar(-301,50,600,color='darkblue',alpha=0.75)
+plt.bar(86701,350/unit_divider,600,color='red',alpha=0.75)
+plt.bar(86701,250/unit_divider,600,color='orange',alpha=0.75)
+plt.bar(86701,179/unit_divider,600,color='lightgreen',alpha=0.75)
+plt.bar(86701,70/unit_divider,600,color='lightblue',alpha=0.75)
+plt.bar(86701,50/unit_divider,600,color='darkblue',alpha=0.75)
 
-plt.bar(86701,350,600,color='red',alpha=0.75)
-plt.bar(86701,250,600,color='orange',alpha=0.75)
-plt.bar(86701,179,600,color='lightgreen',alpha=0.75)
-plt.bar(86701,70,600,color='lightblue',alpha=0.75)
-plt.bar(86701,50,600,color='darkblue',alpha=0.75)
-
-plt.axhline(y=70, color="lightblue",linewidth=0.5,linestyle='dashed',alpha=0.75)
-plt.axhline(y=180, color="orange",linewidth=0.5,linestyle='dashed',alpha=0.75)
-plt.axhline(y=250, color="red",linewidth=0.5,linestyle='dashed',alpha=0.75)	
+plt.axhline(y=70/unit_divider, color="lightblue",linewidth=0.5,linestyle='dashed',alpha=0.75)
+plt.axhline(y=180/unit_divider, color="orange",linewidth=0.5,linestyle='dashed',alpha=0.75)
+plt.axhline(y=250/unit_divider, color="red",linewidth=0.5,linestyle='dashed',alpha=0.75)	
 
 plt.grid(color='lightblue',alpha=0.25,axis='y')
 	   
@@ -376,12 +385,12 @@ for r in x:
 		label = str(int2hm(r[0])+"-"+int2hm(r[1])+" +"+f'{advices_irate[i]:.3f}'+"U/h")
 	else:
 		label = str(int2hm(r[0])+"-"+int2hm(r[1])+" "+f'{advices_irate[i]:.3f}'+"U/h")
-	plt.text((r[0]+r[1])/2,y[i][-1]+50,s=label,fontsize=9,c=scale_lightness(color, 0.75))
+	plt.text((r[0]+r[1])/2,(y[i][-1]+50)/unit_divider+20*i/unit_divider,s=label,fontsize=9,c=scale_lightness(color, 0.75))
 	label = ''
 	if (advices_gdelta[i] >0):
 		label = '[+'
 	label += f'{advices_gdelta[i]:.2f}' + args.unit + ' ' + f'{advices_iquantity[i]:.3f}' + 'U]'
-	plt.text((r[0]+r[1])/2,y[i][-1]+43,s=label,fontsize=7, c=scale_lightness(color, 0.75))
+	plt.text((r[0]+r[1])/2,(y[i][-1]+43)/unit_divider+20*i/unit_divider,s=label,fontsize=7, c=scale_lightness(color, 0.75))
 	i+=1
 
 plt.show()

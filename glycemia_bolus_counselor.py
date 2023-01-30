@@ -27,9 +27,9 @@ parser.add_argument("-ln", "--lastname", type=str, required=True, help='paient l
 parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
 parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
-parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, mmol/L')
+parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, g/l, mmol/l')
 parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit)')
-parser.add_argument("-gt", "--glycemiatarget", type=int, required=False, help='patient glycemia target', default=120)
+parser.add_argument("-gt", "--glycemiatarget", type=float, required=True, help='patient glycemia target (same unit as --unit)')
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
 parser.add_argument("-il", "--insulinactivelength", type=int, required=False, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
 parser.add_argument("-gs", "--glucosesensor", type=str, required=False, help='patient glucose sensor reference', default='na')
@@ -39,6 +39,14 @@ parser.add_argument("-ecmd", "--enablemediandeviationcorrection", type=bool, def
 parser.add_argument("-cmd", "--correctmediandeviation", type=int, default=30, help='experimental - max deviation target to reach until to stop data correction')
 
 args = parser.parse_args()
+
+unit_divider = 1
+if 'mg/' in args.unit:
+	unit_divider = 1
+elif 'g/' in args.unit:
+	unit_divider = 100
+elif 'mmol/' in args.unit:
+	unit_divider = 18
 
 def scale_lightness(rgb, scale_l):
     # convert rgb to hls
@@ -308,45 +316,45 @@ ax.legend(handles=[median_patch,median_sync_bolus_patch])
 plt.get_current_fig_manager().set_window_title('OpenSource Insulin Bolus Counselor')
 plt.suptitle("OpenSource Insulin Bolus Counselor",fontsize=20)
 
-plt.text(-11000,392,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALTH DATA OLDER THAN 15 DAYS",color='red',fontsize=8)
-plt.text(-11000,386,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
-plt.text(-11000,380,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
+plt.text(-11000,392/unit_divider,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALTH DATA OLDER THAN 15 DAYS",color='red',fontsize=8)
+plt.text(-11000,386/unit_divider,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
+plt.text(-11000,380/unit_divider,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
-plt.text(4.5*3600,372,s="data start :          "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366,s="data end :           "+str(end_date),fontsize=7)
-plt.text(4.5*3600,360,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
-plt.text(4.5*3600,354,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
+plt.text(4.5*3600,372/unit_divider,s="data start :          "+str(start_date),fontsize=7)
+plt.text(4.5*3600,366/unit_divider,s="data end :           "+str(end_date),fontsize=7)
+plt.text(4.5*3600,360/unit_divider,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
+plt.text(4.5*3600,354/unit_divider,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
 
-plt.text(9*3600,372,s="patient : "+args.name+" "+args.lastname,fontsize=7)
-plt.text(9*3600,366,s="age : "+str(args.age)+ " years old",fontsize=7)
-plt.text(9*3600,360,s="weight : "+str(last_known_weight)+"Kg ["+last_known_weight_date+"]",fontsize=7)
+plt.text(9*3600,372/unit_divider,s="patient : "+args.name+" "+args.lastname,fontsize=7)
+plt.text(9*3600,366/unit_divider,s="age : "+str(args.age)+ " years old",fontsize=7)
+plt.text(9*3600,360/unit_divider,s="weight : "+str(last_known_weight)+"Kg ["+last_known_weight_date+"]",fontsize=7)
 
 
-plt.text(12*3600,372,s="insulin pump : "+args.insulinpump,fontsize=7)
-plt.text(12*3600,366,s="glucose sensor : "+args.glucosesensor,fontsize=7)
+plt.text(12*3600,372/unit_divider,s="insulin pump : "+args.insulinpump,fontsize=7)
+plt.text(12*3600,366/unit_divider,s="glucose sensor : "+args.glucosesensor,fontsize=7)
 
-plt.text(15*3600,372,s="insulin sensitivity : "+str(args.insulinsensitivity)+" "+args.unit+" for 1U",fontsize=7)
-plt.text(15*3600,366,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
-plt.text(15*3600,360,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
+plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+str(args.insulinsensitivity)+" "+args.unit+" for 1U",fontsize=7)
+plt.text(15*3600,366/unit_divider,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
+plt.text(15*3600,360/unit_divider,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
 if last_max_ketones > 0:
-	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l ["+last_max_ketones_date+"]",fontsize=7)
+	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l ["+last_max_ketones_date+"]",fontsize=7)
 else:
-	plt.text(15*3600,354,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
+	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
-plt.text(22*3600,392,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386,s="revision : v0.4 build 20230128_01",fontsize=7)
-plt.text(22*3600,380,s="created on 20230116",fontsize=7)
-plt.text(22*3600,374,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
+plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.5 build 20230130_01",fontsize=7)
+plt.text(22*3600,380/unit_divider,s="created on 20230116",fontsize=7)
+plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
-plt.text(-11000,-20,s="The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.",fontsize=7)
-plt.text(-11000,-26,s="It then select all bolus data series that did start close to the glycemia target (+/- 10% of patient insulin sensitivity) to make sure to analize",fontsize=7)
-plt.text(-11000,-32,s="the quantity of insulin supplied to the patient against his meal carbone count. The bolus data series starting outside the target range could then",fontsize=7)
-plt.text(-11000,-38,s="be analized to evaluate patient insulin sensitivity (not yet included in report). In this report, meals are planned at "+args.meals,fontsize=7)
+plt.text(-11000,-20/unit_divider,s="The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.",fontsize=7)
+plt.text(-11000,-26/unit_divider,s="It then select all bolus data series that did start close to the glycemia target (+/- 10% of patient insulin sensitivity) to make sure to analize",fontsize=7)
+plt.text(-11000,-32/unit_divider,s="the quantity of insulin supplied to the patient against his meal carbone count. The bolus data series starting outside the target range could then",fontsize=7)
+plt.text(-11000,-38/unit_divider,s="be analized to evaluate patient insulin sensitivity (not yet included in report). In this report, meals are planned at "+args.meals,fontsize=7)
 #plt.text(-11000,-44,s="",fontsize=7)
 		 
 plt.ylabel('glucose '+args.unit)
-plt.ylim(0,350)
-plt.yticks([0,50,70,100,150,180,200,250,300,350])
+plt.ylim(0,350/unit_divider)
+plt.yticks([0,50/unit_divider,70/unit_divider,100/unit_divider,150/unit_divider,180/unit_divider,200/unit_divider,250/unit_divider,300/unit_divider,350/unit_divider])
 
 plt.xlabel('time')
 plt.xticks(ticks=[0,3600,7200,10800,14400,18000,21600,25200,28800,32400,36000,\
@@ -356,21 +364,21 @@ plt.xticks(ticks=[0,3600,7200,10800,14400,18000,21600,25200,28800,32400,36000,\
 				 '13h00','14h00','15h00','16h00','17h00','18h00','19h00',\
 				 '20h00','21h00','22h00','23h00','24h00'])
 
-plt.bar(-301,350,600,color='red',alpha=0.75)
-plt.bar(-301,250,600,color='orange',alpha=0.75)
-plt.bar(-301,179,600,color='lightgreen',alpha=0.75)
-plt.bar(-301,70,600,color='lightblue',alpha=0.75)
-plt.bar(-301,50,600,color='darkblue',alpha=0.75)
+plt.bar(-301,350/unit_divider,600,color='red',alpha=0.75)
+plt.bar(-301,250/unit_divider,600,color='orange',alpha=0.75)
+plt.bar(-301,179/unit_divider,600,color='lightgreen',alpha=0.75)
+plt.bar(-301,70/unit_divider,600,color='lightblue',alpha=0.75)
+plt.bar(-301,50/unit_divider,600,color='darkblue',alpha=0.75)
 
-plt.bar(86701,350,600,color='red',alpha=0.75)
-plt.bar(86701,250,600,color='orange',alpha=0.75)
-plt.bar(86701,179,600,color='lightgreen',alpha=0.75)
-plt.bar(86701,70,600,color='lightblue',alpha=0.75)
-plt.bar(86701,50,600,color='darkblue',alpha=0.75)
+plt.bar(86701,350/unit_divider,600,color='red',alpha=0.75)
+plt.bar(86701,250/unit_divider,600,color='orange',alpha=0.75)
+plt.bar(86701,179/unit_divider,600,color='lightgreen',alpha=0.75)
+plt.bar(86701,70/unit_divider,600,color='lightblue',alpha=0.75)
+plt.bar(86701,50/unit_divider,600,color='darkblue',alpha=0.75)
 
-plt.axhline(y=70, color="lightblue",linewidth=0.5,linestyle='dashed',alpha=0.75)
-plt.axhline(y=180, color="orange",linewidth=0.5,linestyle='dashed',alpha=0.75)
-plt.axhline(y=250, color="red",linewidth=0.5,linestyle='dashed',alpha=0.75)	
+plt.axhline(y=70/unit_divider, color="lightblue",linewidth=0.5,linestyle='dashed',alpha=0.75)
+plt.axhline(y=180/unit_divider, color="orange",linewidth=0.5,linestyle='dashed',alpha=0.75)
+plt.axhline(y=250/unit_divider, color="red",linewidth=0.5,linestyle='dashed',alpha=0.75)	
 
 plt.grid(color='lightblue',alpha=0.25,axis='y')
 	   
@@ -394,6 +402,7 @@ for r in meals:
 	iq = gdelta/insulin_sensitivity
 	ir = iq/(insulin_active_length/3600)
 	label = r+"-"+int2hm(hm2int(r)+insulin_active_length)
+	label1 = str(np.median(bolus_meal_iq[i])) + 'U/' + str(np.median(bolus_meal_carb[i])) +'g carbs' + ' r=' + str(int(np.median(bolus_meal_carb[i])/np.median(bolus_meal_iq[i])))
 	label2 = ''
 	if gdelta > 0:
 		label2 = '+'+f'{gdelta:.3f}'+" "+args.unit
@@ -415,10 +424,11 @@ for r in meals:
 		label4 += " +"+f'{rdelta:0.1f}'+'g/U'
 	else:
 		label4 += " "+f'{rdelta:0.1f}'+'g/U'
-	plt.text(hm2int(r),300,s=label,fontsize=9,c='red')
-	plt.text(hm2int(r),294,s=label2,fontsize=9,c='red')
-	plt.text(hm2int(r),288,s=label3,fontsize=9,c='red')
-	plt.text(hm2int(r),282,s=label4,fontsize=9,c='red')
+	plt.text(hm2int(r),300/unit_divider,s=label,fontsize=9,c='red')
+	plt.text(hm2int(r),294/unit_divider,s=label1,fontsize=9,c='red')
+	plt.text(hm2int(r),288/unit_divider,s=label2,fontsize=9,c='red')
+	plt.text(hm2int(r),282/unit_divider,s=label3,fontsize=9,c='red')
+	plt.text(hm2int(r),276/unit_divider,s=label4,fontsize=9,c='red')
 	i+=1
 	
 #plt.plot(glycemia_x, gaussian_filter1d(glycemia_min, sigma=s), linewidth=0.2, color='mediumpurple',alpha=0.4,antialiased=True)
