@@ -150,7 +150,7 @@ Additionnal details available on https://github.com/ffrouin/myDiabby
 
 ### exemple with original data in mg/dl
 ```
-/glycemia_bolus_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mg/dl -m "07:00,12:00,16:00,19:00" -sd 2022/11/01 -gt 120
+./glycemia_bolus_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mg/dl -m "07:00,12:00,16:00,19:00" -sd 2022/11/01 -gt 120
 ```
 ![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Bolus_Counselor_mgdl.png)
 
