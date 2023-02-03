@@ -27,8 +27,9 @@ parser.add_argument("-ln", "--lastname", type=str, required=True, help='paient l
 parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
 parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
-parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, mmol/L')
-parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit)')
+parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, g/l, mmol/l')
+parser.add_argument("-fu", "--fromunit", type=str, required=False, help='mg/dl, g/l, mmol/l', default='none')
+parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit or --fromunit if used)')
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
 parser.add_argument("-il", "--insulinactivelength", type=int, required=True, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
 parser.add_argument("-gs", "--glucosesensor", type=str, required=False, help='patient glucose sensor reference', default='na')
@@ -40,12 +41,30 @@ parser.add_argument("-cmd", "--correctmediandeviation", type=int, default=30, he
 args = parser.parse_args()
 
 unit_divider = 1
-if 'mg/' in args.unit:
+if 'mg/dl' == args.unit:
 	unit_divider = 1
-elif 'g/' in args.unit:
+elif 'g/l' == args.unit:
 	unit_divider = 100
-elif 'mmol/' in args.unit:
+elif 'mmol/l' == args.unit:
 	unit_divider = 18
+
+def convertUnit(unit_from, unit_to, v):
+	if 'mg/dl' == unit_from:
+		if 'g/l' == unit_to:
+			return(v/100)
+		elif 'mmol/l' == unit_to:
+			return(v/18)
+	elif 'g/l' == unit_from:
+		if 'mg/dl' == unit_to:
+			return(v*100)
+		elif 'mmol/l' == unit_to:
+			return(v*100/18)	
+	elif 'mmol/l' == unit_from:
+		if 'mg/dl' == unit_to:
+			return(v*18)
+		elif 'g/l' == unit_to:
+			return(v*18/100)
+	return(v)
 
 def scale_lightness(rgb, scale_l):
     # convert rgb to hls
@@ -75,7 +94,6 @@ def correctDeviation(data, target):
 				data[i-1] = (data[i-1]+data[i])/2 
 			i+=1
 	return(data)
-
 
 def lfunc(slope, intercept, x):
 	return slope * x + intercept
@@ -137,8 +155,8 @@ def basalEfficientSubRanges(ranges, r_step=300, r_scan_length=5400, r_min=900):
 					last = i
 		if r[-1] - last > r_min:
 			subRanges.append([last, r[-1]])
-	if ranges[-1][-1] - last > r_min:
-		subRanges.append([last, ranges[-1][-1]])
+#	if ranges[-1][-1] - last > r_min:
+#		subRanges.append([last, ranges[-1][-1]])
 	return(subRanges)
 
 ## start of main
@@ -147,7 +165,10 @@ def basalEfficientSubRanges(ranges, r_step=300, r_scan_length=5400, r_min=900):
 
 meals = args.meals.split(',')
 insulin_active_length = args.insulinactivelength # secs
-insulin_sensitivity = args.insulinsensitivity
+if 'none' not in args.fromunit:
+	insulin_sensitivity = convertUnit(args.fromunit, args.unit, args.insulinsensitivity)
+else:
+	insulin_sensitivity = args.insulinsensitivity
 
 glycemia_stats = {}
 glycemia_x = []
@@ -227,6 +248,8 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 			continue
 	
 		glycemia = float(mydiabby_line[2])
+		if 'none' not in args.fromunit:
+			glycemia = convertUnit(args.fromunit, args.unit, glycemia)
 		if t not in glycemia_stats.keys():
 			glycemia_stats[t] = []
 		glycemia_stats[t].append(glycemia)
@@ -277,10 +300,10 @@ plt.text(-11000,392/unit_divider,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALT
 plt.text(-11000,386/unit_divider,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
 plt.text(-11000,380/unit_divider,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
-plt.text(4.5*3600,372/unit_divider,s="data start :         "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366/unit_divider,s="data end :           "+str(end_date),fontsize=7)
-plt.text(4.5*3600,360/unit_divider,s="date:                   "+str(datetime.datetime.now()),fontsize=7)
-plt.text(4.5*3600,354/unit_divider,s="data source:        "+args.mydiabbycsvfile,fontsize=7)
+plt.text(4.5*3600,372/unit_divider,s="data start :      "+str(start_date),fontsize=7)
+plt.text(4.5*3600,366/unit_divider,s="data end :        "+str(end_date),fontsize=7)
+plt.text(4.5*3600,360/unit_divider,s="date:             "+str(datetime.datetime.now()),fontsize=7)
+plt.text(4.5*3600,354/unit_divider,s="data source:      "+args.mydiabbycsvfile,fontsize=7)
 
 plt.text(9*3600,372/unit_divider,s="patient : "+args.name+" "+args.lastname,fontsize=7)
 plt.text(9*3600,366/unit_divider,s="age : "+str(args.age)+ " years old",fontsize=7)
@@ -290,7 +313,7 @@ plt.text(9*3600,360/unit_divider,s="weight : "+str(last_known_weight)+"Kg ["+las
 plt.text(12*3600,372/unit_divider,s="insulin pump : "+args.insulinpump,fontsize=7)
 plt.text(12*3600,366/unit_divider,s="glucose sensor : "+args.glucosesensor,fontsize=7)
 
-plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+str(args.insulinsensitivity)+args.unit+" for 1U",fontsize=7)
+plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+f'{insulin_sensitivity:.2f}'+args.unit+" for 1U",fontsize=7)
 plt.text(15*3600,366/unit_divider,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
 plt.text(15*3600,360/unit_divider,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
 if last_max_ketones > 0:
@@ -299,7 +322,7 @@ else:
 	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386/unit_divider,s="revision : v0.10 build 20230130_01",fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.11 build 20230203_01",fontsize=7)
 plt.text(22*3600,380/unit_divider,s="created on 20230111",fontsize=7)
 plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
@@ -385,12 +408,12 @@ for r in x:
 		label = str(int2hm(r[0])+"-"+int2hm(r[1])+" +"+f'{advices_irate[i]:.3f}'+"U/h")
 	else:
 		label = str(int2hm(r[0])+"-"+int2hm(r[1])+" "+f'{advices_irate[i]:.3f}'+"U/h")
-	plt.text((r[0]+r[1])/2,(y[i][-1]+50)/unit_divider+20*i/unit_divider,s=label,fontsize=9,c=scale_lightness(color, 0.75))
+	plt.text((r[0]+r[1])/2,(y[i][-1]+30)/unit_divider+15*i/unit_divider,s=label,fontsize=9,c=scale_lightness(color, 0.75))
 	label = ''
 	if (advices_gdelta[i] >0):
 		label = '[+'
 	label += f'{advices_gdelta[i]:.2f}' + args.unit + ' ' + f'{advices_iquantity[i]:.3f}' + 'U]'
-	plt.text((r[0]+r[1])/2,(y[i][-1]+43)/unit_divider+20*i/unit_divider,s=label,fontsize=7, c=scale_lightness(color, 0.75))
+	plt.text((r[0]+r[1])/2,(y[i][-1]+23)/unit_divider+15*i/unit_divider,s=label,fontsize=7, c=scale_lightness(color, 0.75))
 	i+=1
 
 plt.show()

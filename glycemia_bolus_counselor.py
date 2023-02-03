@@ -28,8 +28,9 @@ parser.add_argument("-a", "--age", type=str, required=True, help='patient age')
 parser.add_argument("-m", "--meals", type=str, required=True, help='time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"')
 parser.add_argument("-ip", "--insulinpump", type=str, required=False, help='patient insulin pump reference', default='na')
 parser.add_argument("-u", "--unit", type=str, required=True, help='mg/dl, g/l, mmol/l')
-parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit)')
-parser.add_argument("-gt", "--glycemiatarget", type=float, required=True, help='patient glycemia target (same unit as --unit)')
+parser.add_argument("-fu", "--fromunit", type=str, required=False, help='mg/dl, g/l, mmol/l', default='none')
+parser.add_argument("-is", "--insulinsensitivity", type=float, required=True, help='patient insulin sensitivity (same unit as --unit or --fromunit if used)')
+parser.add_argument("-gt", "--glycemiatarget", type=float, required=True, help='patient glycemia target (same unit as --unit or --fromunit if used)')
 parser.add_argument("-ir", "--insulinreference", type=str, required=False, help='patient insulin reference', default='na')
 parser.add_argument("-il", "--insulinactivelength", type=int, required=False, help='patient insulin active length in seconds. Default is 2h (7200)', default=7200)
 parser.add_argument("-gs", "--glucosesensor", type=str, required=False, help='patient glucose sensor reference', default='na')
@@ -41,12 +42,30 @@ parser.add_argument("-cmd", "--correctmediandeviation", type=int, default=30, he
 args = parser.parse_args()
 
 unit_divider = 1
-if 'mg/' in args.unit:
+if 'mg/dl' == args.unit:
 	unit_divider = 1
-elif 'g/' in args.unit:
+elif 'g/l' == args.unit:
 	unit_divider = 100
-elif 'mmol/' in args.unit:
+elif 'mmol/l' == args.unit:
 	unit_divider = 18
+
+def convertUnit(unit_from, unit_to, v):
+	if 'mg/dl' == unit_from:
+		if 'g/l' == unit_to:
+			return(v/100)
+		elif 'mmol/l' == unit_to:
+			return(v/18)
+	elif 'g/l' == unit_from:
+		if 'mg/dl' == unit_to:
+			return(v*100)
+		elif 'mmol/l' == unit_to:
+			return(v*100/18)	
+	elif 'mmol/l' == unit_from:
+		if 'mg/dl' == unit_to:
+			return(v*18)
+		elif 'g/l' == unit_to:
+			return(v*18/100)
+	return(v)
 
 def scale_lightness(rgb, scale_l):
     # convert rgb to hls
@@ -132,7 +151,10 @@ def select_data(t_start, t_end, data):
 
 meals = args.meals.split(',')
 insulin_active_length = args.insulinactivelength # secs
-insulin_sensitivity = args.insulinsensitivity # 
+if 'none' not in args.fromunit:
+	insulin_sensitivity = convertUnit(args.fromunit, args.unit, args.insulinsensitivity)
+else:
+	insulin_sensitivity = args.insulinsensitivity
 
 glycemia_stats = {}
 glycemia_x = []
@@ -247,6 +269,8 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if glycemia == '':
 			continue
 		glycemia = float(glycemia)
+		if 'none' not in args.fromunit:
+			glycemia = convertUnit(args.fromunit, args.unit, glycemia)
 		
 		if t not in glycemia_stats.keys():
 			glycemia_stats[t] = []
@@ -267,7 +291,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 				bolus_start_glycemia = glycemia
 			d += delta
 			if d >= 0:
-				if bolus_start_glycemia > args.glycemiatarget-insulin_sensitivity/10 and bolus_start_glycemia < args.glycemiatarget+insulin_sensitivity/10:
+				if bolus_start_glycemia > convertUnit(args.fromunit, args.unit, args.glycemiatarget)-insulin_sensitivity/10 and bolus_start_glycemia < convertUnit(args.fromunit, args.unit,args.glycemiatarget)+insulin_sensitivity/10:
 					if  int2hm(d) not in glycemia_bolus.keys():
 						glycemia_bolus[int2hm(d)] = []
 					glycemia_bolus[int2hm(d)].append(glycemia)
@@ -333,7 +357,7 @@ plt.text(9*3600,360/unit_divider,s="weight : "+str(last_known_weight)+"Kg ["+las
 plt.text(12*3600,372/unit_divider,s="insulin pump : "+args.insulinpump,fontsize=7)
 plt.text(12*3600,366/unit_divider,s="glucose sensor : "+args.glucosesensor,fontsize=7)
 
-plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+str(args.insulinsensitivity)+" "+args.unit+" for 1U",fontsize=7)
+plt.text(15*3600,372/unit_divider,s="insulin sensitivity : "+f'{insulin_sensitivity:.2f}'+" "+args.unit+" for 1U",fontsize=7)
 plt.text(15*3600,366/unit_divider,s="insulin active length : "+str(int(args.insulinactivelength/3600))+"h ["+args.insulinreference+"]",fontsize=7)
 plt.text(15*3600,360/unit_divider,s="HbA1c : "+str(last_known_hba1c)+'% ['+last_known_hba1c_date+"]",fontsize=7)
 if last_max_ketones > 0:
@@ -342,7 +366,7 @@ else:
 	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386/unit_divider,s="revision : v0.5 build 20230130_01",fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.6 build 20230203_01",fontsize=7)
 plt.text(22*3600,380/unit_divider,s="created on 20230116",fontsize=7)
 plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 

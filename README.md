@@ -5,6 +5,8 @@ The toolkit actually is based on two tools :
   - the basal counselor : for basal scheme changes
   - the bolus counselor : to adjust basal and/or bolus ratio of meals
 
+The toolkit is able to manage unit conversion (mg/dl, g/l, mmol/l)
+
 ## DISCLAIMER AND WARNINGS
 
 This tool has been developped by parents of a Diabete Type 1 child in order to have a better understanding of the insulin treatment changes driven by his diabetic pediatrician.
@@ -40,7 +42,7 @@ and the patient digestion of his meal (ie. glucose assimilation process and rate
 
 ```
 usage: glycemia_basal_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
-                                   [-ip INSULINPUMP] -u UNIT -is INSULINSENSITIVITY
+                                   [-ip INSULINPUMP] -u UNIT [-fu FROMUNIT] -is INSULINSENSITIVITY
                                    [-ir INSULINREFERENCE] -il INSULINACTIVELENGTH
                                    [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
 
@@ -58,9 +60,11 @@ options:
                         time list of patient meals. Syntax is "07:00,12:00,16:00,19:00"
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
-  -u UNIT, --unit UNIT  mg/dl, mmol/L
+  -u UNIT, --unit UNIT  mg/dl, g/l, mmol/l
+  -fu FROMUNIT, --fromunit FROMUNIT
+                        mg/dl, g/l, mmol/l
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
-                        patient insulin sensitivity (same unit as --unit)
+                        patient insulin sensitivity (same unit as --unit or --fromunit if used)
   -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
                         patient insulin reference
   -il INSULINACTIVELENGTH, --insulinactivelength INSULINACTIVELENGTH
@@ -76,8 +80,12 @@ options:
 Additionnal details available on https://github.com/ffrouin/myDiabby
 ```
 
-### exemple
-![OpenSource Insulin Counselor](20230126_OpenSource_Insulin_Basal_Counselor.png)
+### exemple with original data in mg/dl
+
+```
+./glycemia_basal_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mg/dl -m "07:00,12:00,16:00,19:00" -sd 2022/12/15
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Basal_Counselor_mgdl.png)
 
 ## OpenSource Insulin Bolus Counselor
 The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal.
@@ -85,12 +93,30 @@ It then select all bolus data series that did start close to the glycemia target
 the quantity of insulin supplied to the patient against his meal carbone count. The bolus data series starting outside the target range could then
 be analized to evaluate patient insulin sensitivity (not yet included in report).
 
+### exemple with original data in mg/dl converted into g/l
+```
+./glycemia_basal_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u g/l -m "07:00,12:00,16:00,19:00" -sd 2022/12/15 -fu mg/dl
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Basal_Counselor_mgdl2gl.png)
+
+### exemple with original data in mg/dl converted into mmol/l
+```
+./glycemia_basal_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mmol/l -m "07:00,12:00,16:00,19:00" -sd 2022/12/15 -fu mg/dl
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Basal_Counselor_mgdl2mmoll.png)
+
+## OpenSource Insulin Bolus Counselor
+
+### description
+The OpenSource Insulin Bolus Counseler takes patient meals time as entry data table and then it starts synchronize all bolus data series for each meal. It then select all bolus data series that did start close to the glycemia target (+/- 10% of patient insulin sensitivity) to make sure to analize the quantity of insulin supplied to the patient against his meal carbone count. The bolus data series starting outside the target range could then be analized to evaluate patient insulin sensitivity (not yet included in report).
+
 ### usage
 ```
-usage: glycemia_bolus_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
-                                   [-ip INSULINPUMP] -u UNIT -is INSULINSENSITIVITY -gt
-                                   GLYCEMIATARGET [-ir INSULINREFERENCE] [-il INSULINACTIVELENGTH]
-                                   [-gs GLUCOSESENSOR] [-df DATEFORWARD] [-sd STARTDATE]
+Usagge: glycemia_bolus_counselor.py [-h] -f MYDIABBYCSVFILE -n NAME -ln LASTNAME -a AGE -m MEALS
+                                   [-ip INSULINPUMP] -u UNIT [-fu FROMUNIT] -is INSULINSENSITIVITY
+                                   -gt GLYCEMIATARGET [-ir INSULINREFERENCE]
+                                   [-il INSULINACTIVELENGTH] [-gs GLUCOSESENSOR] [-df DATEFORWARD]
+                                   [-sd STARTDATE]
 
 OpenSource tools that tries help with diabetes
 
@@ -107,10 +133,12 @@ options:
   -ip INSULINPUMP, --insulinpump INSULINPUMP
                         patient insulin pump reference
   -u UNIT, --unit UNIT  mg/dl, g/l, mmol/l
+  -fu FROMUNIT, --fromunit FROMUNIT
+                        mg/dl, g/l, mmol/l
   -is INSULINSENSITIVITY, --insulinsensitivity INSULINSENSITIVITY
-                        patient insulin sensitivity (same unit as --unit)
+                        patient insulin sensitivity (same unit as --unit or --fromunit if used)
   -gt GLYCEMIATARGET, --glycemiatarget GLYCEMIATARGET
-                        patient glycemia target (same unit as --unit)
+                        patient glycemia target (same unit as --unit or --fromunit if used)
   -ir INSULINREFERENCE, --insulinreference INSULINREFERENCE
                         patient insulin reference
   -il INSULINACTIVELENGTH, --insulinactivelength INSULINACTIVELENGTH
@@ -124,9 +152,22 @@ options:
                         date to start analyze with, now() by default
 
 Additionnal details available on https://github.com/ffrouin/myDiabby
-
 ```
 
-### exemple
-![OpenSource Insulin Counselor](20230126_OpenSource_Insulin_Bolus_Counselor.png)
+### exemple with original data in mg/dl
+```
+/glycemia_bolus_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mg/dl -m "07:00,12:00,16:00,19:00" -sd 2022/11/01 -gt 120
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Bolus_Counselor_mgdl.png)
 
+### exemple with original data in md/dl converted to g/l
+```
+./glycemia_bolus_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u g/l -m "07:00,12:00,16:00,19:00" -sd 2022/11/01 -gt 120 -fu mg/dl
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Bolus_Counselor_mgdl2gl.png)
+
+### exemple with original data in md/dl converted to mmol/l
+```
+./glycemia_bolus_counselor.py -f myDiabby_data_20230203_fake_id.csv -n 'name' -ln 'lastname' -a 2.5 -ip 'MedTronic 640G' -is 160 -gs 'Guardian 2-Link' -ir 'Humalog' -il 7200 -u mmol/l -m "07:00,12:00,16:00,19:00" -sd 2022/11/01 -gt 120 -fu mg/dl
+```
+![OpenSource Insulin Counselor](20230203_OpenSource_Insulin_Bolus_Counselor_mgdl2mmoll.png)
