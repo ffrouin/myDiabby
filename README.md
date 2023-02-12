@@ -32,7 +32,7 @@ could sometimes looks like sort of random data series, especially for childrens.
 
 The median data analysis allows to process the glycemic data series in regards of the probability blood sugar events to occur over time.
 
-If we consider there were not any major change in patient life for past 15 days
+If we consider there was not any major change in patient life for past 15 days
 
 If we consider there will not be any major change in patient life for next 15 days
 
