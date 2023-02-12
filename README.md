@@ -9,11 +9,49 @@ The toolkit is able to manage unit conversion (mg/dl, g/l, mmol/l)
 
 ## DISCLAIMER AND WARNINGS
 
-This tool has been developped by parents of a Diabete Type 1 child in order to have a better understanding of the insulin treatment changes driven by his diabetic pediatrician.
+These tools have been developped by parents of a Diabete Type 1 child in order to have a better understanding of the insulin treatment
+changes driven by his diabetic pediatrician.
 
-All information, thought, and code described here is intended for informational and educational purposes only. Do not use the information or code to make medical decisions. Share the information with your doctor if you think there is interresting data here to try take advantage of.
+All information, thought, and code described here is intended for informational and educational purposes only. Do not use the information
+or code to make medical decisions. Share the information with your doctor if you think there is interresting data here to try take advantage of.
 
-## Requirements
+## ABSTRACT
+
+Compared to adults, childrens are going to face major physiological changes during their growth. This will lead to insulin growing needs that will
+be reflected by a growing average glucose concentration in blood. High glucose concentration in blood leads to well known collateral damages but
+later in life. The objective is to try, as much as possible, to control or limit the hyperglycemic state over time in order to preserve patient
+life expectancy.
+
+Low blood sugar level is also a major concern as it has immediate effect on patient that could lead to loss of conciousness and to death. Insulin
+treatment may be responsible for these hypoglycemia events. It is also a major objective to try prevent and limit these events in patient life.
+
+Continous Glycemic Monitoring (CGM) reporting about glucose concentration in blood of a patient over time allows understand glycemic data series
+could sometimes looks like sort of random data series, especially for childrens.
+
+### MEDIAN ANALYSIS
+
+The median data analysis allows to process the glycemic data series in regards of the probability blood sugar events to occur over time.
+
+If we consider there were not any major changes in patient life for past 15 days
+If we consider there will not be any major changes in patient life for next 15 days
+
+We can then consider the last 15 days of data may reflect the data we are going to collect for the next 15 days.
+If we try to have a leverage on last 15 days of data, it shoud be reflected by the data collected for the next 15 days.
+
+This is the way we are going try to "take control" of patient glucose concentration in blood over time.
+
+Any major change in patient life may disturb these plans to manage the insulin treatment.
+
+### TREATMENT CHANGES
+
+The tools will report about changes to be applied for basal scheme or bolus meal ratios. We expect the median values of blood sugar to be
+stable between meals and bolus ratios to bring back the patient at the glucose concentration collected before the meal started. These are
+the basic rules these tools will follow.
+
+In order to reach our objectives, we need review the patient data every 15 days and to apply half of the theorical recommended values for
+changes, in order to reach out to stability without exceeding momentary patient stability points.
+
+## REQUIREMENTS
 
 ### libraries
 
