@@ -38,7 +38,7 @@ If we consider there will not be any major change in patient life for next 15 da
 
 We can then consider the last 15 days of data may reflect the data we are going to collect for the next 15 days.
 
-If we try to have a leverage on last 15 days of data, it shoud be reflected by the data collected for the next 15 days.
+If we try to have a leverage on last 15 days of data, it shoud be reflected by the data  we are going to collect for the next 15 days.
 
 This is the way we are going try to "take control" of patient glucose concentration in blood over time.
 
