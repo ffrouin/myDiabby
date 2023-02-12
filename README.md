@@ -19,7 +19,7 @@ or code to make medical decisions. Share the information with your doctor if you
 
 Compared to adults, childrens are going to face major physiological changes during their growth. This will lead to insulin growing needs that will
 be reflected by a growing average glucose concentration in blood. High glucose concentration in blood leads to well known collateral damages but
-later in life. The objective is to try, as much as possible, to control or limit the hyperglycemic state over time in order to preserve patient
+later in life. The objective is to try, as much as possible, to control or limit the hyperglycemia state over time in order to preserve patient
 life expectancy.
 
 Low blood sugar level is also a major concern as it has immediate effect on patient that could lead to loss of conciousness and to death. Insulin
