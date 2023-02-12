@@ -33,9 +33,11 @@ could sometimes looks like sort of random data series, especially for childrens.
 The median data analysis allows to process the glycemic data series in regards of the probability blood sugar events to occur over time.
 
 If we consider there were not any major changes in patient life for past 15 days
+
 If we consider there will not be any major changes in patient life for next 15 days
 
 We can then consider the last 15 days of data may reflect the data we are going to collect for the next 15 days.
+
 If we try to have a leverage on last 15 days of data, it shoud be reflected by the data collected for the next 15 days.
 
 This is the way we are going try to "take control" of patient glucose concentration in blood over time.
