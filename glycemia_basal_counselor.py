@@ -211,6 +211,9 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 	mydiabby_export = csv.reader(mydiabby,delimiter=',')
 	for mydiabby_line in mydiabby_export:
 		t = str(mydiabby_line[1])
+					
+		if 'time' in t:
+			continue		
 		
 #		if args.date not in mydiabby_line[0]: # filtering mode
 #			continue
@@ -221,10 +224,10 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 			
 		if str(end_date).split(" ")[0] == mydiabby_line[0]:
 			capture = False
-		
-		if not capture:
+			
+		if 'now' not in args.startdate and not capture:
 			continue
-		
+	
 		# collect last known weight to report
 		if mydiabby_line[13] != '':
 			last_known_weight = mydiabby_line[13]
@@ -234,15 +237,16 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if mydiabby_line[14] != '':
 			last_known_hba1c = mydiabby_line[14]
 			last_known_hba1c_date = mydiabby_line[0]	
+
+		if 'now' in args.startdate and not capture:
+			continue
 		
 		# collect max ketones seen in the capture period to report
 		if mydiabby_line[15] != '':
 			if float(mydiabby_line[15]) > last_max_ketones:
 				last_max_ketones = float(mydiabby_line[15])
 				last_max_ketones_date = mydiabby_line[0]
-			
-		if 'time' in t:
-			continue
+
 		glycemia = mydiabby_line[2]
 		if glycemia == '':
 			continue
@@ -301,9 +305,9 @@ plt.text(-11000,386/unit_divider,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT 
 plt.text(-11000,380/unit_divider,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
 plt.text(4.5*3600,372/unit_divider,s="data start :      "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366/unit_divider,s="data end :        "+str(end_date),fontsize=7)
-plt.text(4.5*3600,360/unit_divider,s="date:             "+str(datetime.datetime.now()),fontsize=7)
-plt.text(4.5*3600,354/unit_divider,s="data source:      "+args.mydiabbycsvfile,fontsize=7)
+plt.text(4.5*3600,366/unit_divider,s="data end :       "+str(end_date),fontsize=7)
+plt.text(4.5*3600,360/unit_divider,s="date:               "+str(datetime.datetime.now()),fontsize=7)
+plt.text(4.5*3600,354/unit_divider,s="data source:    "+args.mydiabbycsvfile,fontsize=7)
 
 plt.text(9*3600,372/unit_divider,s="patient : "+args.name+" "+args.lastname,fontsize=7)
 plt.text(9*3600,366/unit_divider,s="age : "+str(args.age)+ " years old",fontsize=7)
@@ -322,7 +326,7 @@ else:
 	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386/unit_divider,s="revision : v0.11 build 20230203_01",fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.12 build 20230212_01",fontsize=7)
 plt.text(22*3600,380/unit_divider,s="created on 20230111",fontsize=7)
 plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 

@@ -227,7 +227,7 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if str(end_date).split(" ")[0] == mydiabby_line[0]:
 			capture = False
 
-		if not capture:
+		if 'now' not in args.startdate and not capture:
 			continue
 		
 		# collect last known weight to report
@@ -239,6 +239,9 @@ with open(args.mydiabbycsvfile, newline='') as mydiabby:
 		if mydiabby_line[14] != '':
 			last_known_hba1c = mydiabby_line[14]
 			last_known_hba1c_date = mydiabby_line[0]	
+
+		if 'now' in args.startdate and not capture:
+			continue
 		
 		# collect max ketones seen in the capture period to report
 		if mydiabby_line[15] != '':
@@ -366,7 +369,7 @@ else:
 	plt.text(15*3600,354/unit_divider,s="max ketones over period : "+str(last_max_ketones)+" mmol/l [na]",fontsize=7)
 
 plt.text(22*3600,392/unit_divider,s='author: Freddy Frouin <freddy@linuxtribe.fr>',fontsize=7)
-plt.text(22*3600,386/unit_divider,s="revision : v0.6 build 20230203_01",fontsize=7)
+plt.text(22*3600,386/unit_divider,s="revision : v0.7 build 20230212_01",fontsize=7)
 plt.text(22*3600,380/unit_divider,s="created on 20230116",fontsize=7)
 plt.text(22*3600,374/unit_divider,s="sources : https://github.com/ffrouin/myDiabby",fontsize=7)
 
@@ -426,7 +429,7 @@ for r in meals:
 	iq = gdelta/insulin_sensitivity
 	ir = iq/(insulin_active_length/3600)
 	label = r+"-"+int2hm(hm2int(r)+insulin_active_length)
-	label1 = str(np.median(bolus_meal_iq[i])) + 'U/' + str(np.median(bolus_meal_carb[i])) +'g carbs' + ' r=' + str(int(np.median(bolus_meal_carb[i])/np.median(bolus_meal_iq[i])))
+	label1 = f'{np.median(bolus_meal_iq[i]):.2f}' + 'U/' + str(np.median(bolus_meal_carb[i])) +'g carbs' + ' r=' + str(int(np.median(bolus_meal_carb[i])/np.median(bolus_meal_iq[i])))
 	label2 = ''
 	if gdelta > 0:
 		label2 = '+'+f'{gdelta:.3f}'+" "+args.unit
