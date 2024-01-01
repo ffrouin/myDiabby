@@ -304,9 +304,9 @@ plt.text(-11000,392/unit_divider,s="WARNINGS !!! DO NOT USE THIS TOOL WITH HEALT
 plt.text(-11000,386/unit_divider,s="!!! DO NOT APPLY ALL RECOMMANDED CHANGES AT THE SAME TIME !!! ",color='red',fontsize=8)
 plt.text(-11000,380/unit_divider,s="DISCUSS THE RESULTS WITH YOUR DOCTOR TO DEFINE WHAT TO DO FIRST",color='red',fontsize=8)
 
-plt.text(4.5*3600,372/unit_divider,s="data start :      "+str(start_date),fontsize=7)
-plt.text(4.5*3600,366/unit_divider,s="data end :       "+str(end_date),fontsize=7)
-plt.text(4.5*3600,360/unit_divider,s="date:               "+str(datetime.datetime.now()),fontsize=7)
+plt.text(4.5*3600,372/unit_divider,s="data start :      "+start_date.strftime("%Y-%m-%d"),fontsize=7)
+plt.text(4.5*3600,366/unit_divider,s="data end :       "+end_date.strftime("%Y-%m-%d"),fontsize=7)
+plt.text(4.5*3600,360/unit_divider,s="date:               "+datetime.datetime.now().strftime("%Y-%m-%d"),fontsize=7)
 plt.text(4.5*3600,354/unit_divider,s="data source:    "+args.mydiabbycsvfile,fontsize=7)
 
 plt.text(9*3600,372/unit_divider,s="patient : "+args.name+" "+args.lastname,fontsize=7)
